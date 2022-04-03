@@ -9,26 +9,22 @@ namespace IJunior.TypedScenes
 {
     public abstract class TypedScene
     {
-        protected async static void LoadScene(string sceneName, LoadSceneMode loadSceneMode)
+        protected static void LoadScene(string sceneName, LoadSceneMode loadSceneMode) =>
+            LoadScene(new PseudoElement(), sceneName, loadSceneMode);
+
+        protected static void LoadScene<T>(T argument, string sceneName, LoadSceneMode loadSceneMode)
         {
-            await ScreenCase.LoadingWithResourceCleanup(sceneName, loadSceneMode);
+            ScreenCase.LoadingWithResourceCleanup(argument, sceneName, loadSceneMode);
         }
 
-        protected async static void LoadScene<T>(T argument, string sceneName, LoadSceneMode loadSceneMode)
-        {
-            await ScreenCase.LoadingWithResourceCleanup(argument, sceneName, loadSceneMode);
-        }
+        protected static void LoadSceneWithLoadingScreen(string sceneName, string loadingScreenName) =>
+            LoadSceneWithLoadingScreen(new PseudoElement(), sceneName, loadingScreenName);
 
-        protected async static void LoadSceneWithLoadingScreen(string sceneName, string loadingScreenName)
+        protected static void LoadSceneWithLoadingScreen<T>(T argument, string sceneName, string loadingScreenName) 
         {
-            await ScreenCase.LoadingWithResourceCleanupUsingLoadingScene(sceneName, loadingScreenName);
+           ScreenCase.LoadingWithResourceCleanupUsingLoadingScene(argument, sceneName, loadingScreenName);
         }
-
-        protected async static void LoadSceneWithLoadingScreen<T>(T argument, string sceneName, string loadingScreenName) 
-        {
-            await ScreenCase.LoadingWithResourceCleanupUsingLoadingScene(argument, sceneName, loadingScreenName);
-        }
-
+        
         private struct ScreenCase : IDisposable
         {
             public AsyncOperationHandle<SceneInstance> Handle { get; }
@@ -49,12 +45,7 @@ namespace IJunior.TypedScenes
                 return new ScreenCase(handle);
             }
 
-            public static async Task LoadingWithResourceCleanup(string sceneName, LoadSceneMode loadSceneMode = LoadSceneMode.Single)
-            {
-                await LoadingWithResourceCleanup(new PseudoElement(), sceneName, loadSceneMode);
-            }
-
-            public static async Task LoadingWithResourceCleanup<T>(T argument, string sceneName,  LoadSceneMode loadSceneMode = LoadSceneMode.Single)
+            public static async void LoadingWithResourceCleanup<T>(T argument, string sceneName,  LoadSceneMode loadSceneMode = LoadSceneMode.Single)
             {
                 ScreenCase screenCase = await GetCase(sceneName, loadSceneMode, false);
 
@@ -64,20 +55,15 @@ namespace IJunior.TypedScenes
                 screenCase.Dispose();
             }
 
-            public static async Task LoadingWithResourceCleanupUsingLoadingScene(string sceneName, string loadingScreenName)
-            {
-                await LoadingWithResourceCleanupUsingLoadingScene(new PseudoElement(), sceneName, loadingScreenName);
-            }
-
-            public static async Task LoadingWithResourceCleanupUsingLoadingScene<T>(T argument, string sceneName, string loadingScreenName)
+            public static async void LoadingWithResourceCleanupUsingLoadingScene<T>(T argument, string sceneName, string loadingScreenName)
             {
                 ScreenCase loadingSceneScreenCase = await GetCase(loadingScreenName, LoadSceneMode.Single, true);
                 ScreenCase targetScreenCase = await GetCase(sceneName, LoadSceneMode.Additive, false);
 
                 if (!(argument is PseudoElement))
-                    LoadingProcessor.Instance.RegisterLoadingScreenModel(targetScreenCase.Scene, loadingSceneScreenCase.Handle);
+                    LoadingProcessor.Instance.RegisterLoadingModel(argument, targetScreenCase.Scene);
 
-                LoadingProcessor.Instance.RegisterLoadingModel(argument, targetScreenCase.Scene);
+                LoadingProcessor.Instance.RegisterLoadingScreenModel(targetScreenCase.Scene, loadingSceneScreenCase.Handle);
 
                 targetScreenCase.Dispose();
             }
@@ -87,8 +73,8 @@ namespace IJunior.TypedScenes
                 Handle.Result.ActivateAsync();
                 Addressables.Release(Handle);
             }
-
-            private struct PseudoElement { }
         }
+        
+        private class PseudoElement { }
     }
 }

@@ -13,12 +13,9 @@ namespace IJunior.TypedScenes
         public void SetLoadingScreen(AsyncOperationHandle<SceneInstance> sceneInstance)
         {
             if (UnloadedLoadingScreen == null)
-            {
-                UnloadedLoadingScreen = () =>
-                {
-                    Addressables.UnloadSceneAsync(sceneInstance);
-                };
-            }
+                UnloadedLoadingScreen = () => Addressables.UnloadSceneAsync(sceneInstance);
+            else
+                throw new NullReferenceException($"{nameof(SceneInstance)} is null.");
         }
 
         protected void UnloadLoadingScreen()

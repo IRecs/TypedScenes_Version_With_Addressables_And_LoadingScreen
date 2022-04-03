@@ -16,6 +16,7 @@ namespace IJunior.TypedScenes
 
         private Dictionary<string, Action> _loadingModelActions = new Dictionary<string, Action>();
         private Dictionary<string, Action> _loadingScreenModelActions = new Dictionary<string, Action>();
+
         public static LoadingProcessor Instance
         {
             get
@@ -36,7 +37,9 @@ namespace IJunior.TypedScenes
 
         public void ApplyLoadingModel(string sceneName)
         {
-            Debug.Log(sceneName);
+            if (string.IsNullOrEmpty(sceneName))
+                return;
+
             if (_loadingModelActions.ContainsKey(sceneName))
             {
                 _loadingModelActions[sceneName]?.Invoke();

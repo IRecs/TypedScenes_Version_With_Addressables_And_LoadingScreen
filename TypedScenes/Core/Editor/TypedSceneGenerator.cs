@@ -84,7 +84,7 @@ namespace IJunior.TypedScenes
             loadMethod.Name = "LoadSceneWithLoadingScreen";
             loadMethod.Attributes = MemberAttributes.Public | MemberAttributes.Static;
 
-            var loadSceneWithLoadingScreen = "LoadSceneWithLoadingScreen(_sceneName, loadingScreenName)";
+            var loadSceneWithLoadingScreen = "LoadSceneWithLoadingScreen(SceneName, loadingScreenName)";
 
             if (parameterType != null)
             {
